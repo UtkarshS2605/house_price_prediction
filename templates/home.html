@@ -1,80 +1,205 @@
 <!DOCTYPE html>
+
 <html>
 <head>
-    <title>House Price Prediction</title>
+<title>House Price Prediction</title>
 
-    <style>
-        body{
-            font-family: Arial;
-            background-color:#f2f2f2;
-            text-align:center;
-            padding-top:50px;
-        }
+<style>
 
-        .container{
-            background:white;
-            width:400px;
-            margin:auto;
-            padding:30px;
-            border-radius:10px;
-            box-shadow:0px 0px 10px gray;
-        }
+body{
+    font-family: Arial, Helvetica, sans-serif;
+    background:#f2f2f2;
+}
 
-        input{
-            width:90%;
-            padding:10px;
-            margin:10px;
-            border-radius:5px;
-            border:1px solid gray;
-        }
+/* main layout */
 
-        button{
-            padding:10px 20px;
-            background:#007BFF;
-            color:white;
-            border:none;
-            border-radius:5px;
-            cursor:pointer;
-        }
+.main-container{
+    display:flex;
+    justify-content:center;
+    align-items:flex-start;
+    gap:40px;
+    margin-top:60px;
+}
 
-        button:hover{
-            background:#0056b3;
-        }
+/* prediction card */
 
-        h1{
-            color:#333;
-        }
-    </style>
+.form-container{
+    background:white;
+    padding:40px;
+    border-radius:12px;
+    width:400px;
+    box-shadow:0px 4px 15px rgba(0,0,0,0.1);
+}
+
+h1{
+    text-align:center;
+    margin-bottom:30px;
+}
+
+/* inputs */
+
+input{
+    width:100%;
+    padding:12px;
+    margin-bottom:15px;
+    border-radius:6px;
+    border:1px solid #ccc;
+    font-size:15px;
+}
+
+/* button */
+
+button{
+    width:100%;
+    padding:12px;
+    background:#1a73e8;
+    color:white;
+    border:none;
+    border-radius:6px;
+    font-size:16px;
+    cursor:pointer;
+}
+
+button:hover{
+    background:#0d5bd3;
+}
+
+/* prediction text */
+
+.result{
+    margin-top:20px;
+    font-size:20px;
+    font-weight:bold;
+    text-align:center;
+}
+
+/* history panel */
+
+.history-container{
+    background:white;
+    padding:25px;
+    border-radius:12px;
+    width:300px;
+    box-shadow:0px 4px 15px rgba(0,0,0,0.1);
+}
+
+.history-container h2{
+    text-align:center;
+    margin-bottom:20px;
+}
+
+#historyList{
+    list-style:none;
+    padding:0;
+}
+
+#historyList li{
+    padding:10px;
+    border-bottom:1px solid #ddd;
+    font-size:15px;
+}
+
+.clear-btn{
+    margin-top:15px;
+    background:#e53935;
+}
+
+.clear-btn:hover{
+    background:#c62828;
+}
+
+</style>
+
 </head>
-
 
 <body>
 
-<div class="container">
+<div class="main-container">
+
+<!-- Prediction Form -->
+
+<div class="form-container">
 
 <h1>House Price Prediction</h1>
 
 <form action="/predict" method="post">
 
-    <input type="text" name="sqft" placeholder="Total Square Feet" required>
+<input type="number" name="sqft" placeholder="Total Square Feet" required>
 
-    <input type="text" name="bath" placeholder="Number of Bathrooms" required>
+<input type="number" name="bath" placeholder="Number of Bathrooms" required>
 
-    <input type="text" name="balcony" placeholder="Number of Balconies" required>
+<input type="number" name="balcony" placeholder="Number of Balconies" required>
 
-    <input type="text" name="bhk" placeholder="Number of BHK" required>
+<input type="number" name="bhk" placeholder="Number of BHK" required>
 
-    <br><br>
-
-    <button type="submit">Predict Price</button>
+<button type="submit">Predict Price</button>
 
 </form>
 
-<br>
-
-<h2>{{ prediction_text }}</h2>
+<div class="result">
+Predicted House Price is {{prediction_text}} Lakhs
+</div>
 
 </div>
+
+<!-- Prediction History -->
+
+<div class="history-container">
+
+<h2>Prediction History</h2>
+
+<ul id="historyList"></ul>
+
+<button class="clear-btn" onclick="clearHistory()">Clear History</button>
+
+</div>
+
+</div>
+
+<script>
+
+/* store latest prediction */
+
+let prediction = "{{prediction_text}}";
+
+if(prediction && prediction !== "None" && prediction !== ""){
+
+    let history = JSON.parse(localStorage.getItem("priceHistory")) || [];
+
+    history.push(prediction);
+
+    localStorage.setItem("priceHistory", JSON.stringify(history));
+}
+
+
+/* show history */
+
+let historyList = document.getElementById("historyList");
+
+let savedHistory = JSON.parse(localStorage.getItem("priceHistory")) || [];
+
+savedHistory.slice().reverse().forEach(function(item){
+
+    let li = document.createElement("li");
+
+    li.textContent = item + " Lakhs";
+
+    historyList.appendChild(li);
+
+});
+
+
+/* clear history */
+
+function clearHistory(){
+
+    localStorage.removeItem("priceHistory");
+
+    location.reload();
+
+}
+
+</script>
 
 </body>
 </html>
